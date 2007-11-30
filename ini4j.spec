@@ -45,10 +45,11 @@ Source0:        http://switch.dl.sourceforge.net/sourceforge/ini4j/%{name}-src-%
 Patch0:		ini4j-build.patch
 BuildRequires:	jpackage-utils >= 1.6
 BuildRequires:  ant
+BuildRequires:  ant-nodeps
 %if ! %{gcj_support}
 BuildArch:      noarch
 %endif
-BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %if %{gcj_support}
 BuildRequires:		java-gcj-compat-devel
