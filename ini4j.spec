@@ -46,6 +46,7 @@ Patch0:		ini4j-build.patch
 BuildRequires:	jpackage-utils >= 1.6
 BuildRequires:  ant
 BuildRequires:  ant-nodeps
+BuildRequires:  ant-junit
 %if ! %{gcj_support}
 BuildArch:      noarch
 %endif
