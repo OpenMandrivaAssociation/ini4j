@@ -34,7 +34,7 @@
 
 Name:		ini4j
 Version:	0.2.6
-Release:	%mkrel 1
+Release:	%mkrel 2
 Epoch:		0
 Summary:        .ini Files For Java
 License:        Apache License
@@ -91,8 +91,8 @@ ant javadoc
 %install
 # jar
 %{__install} -d -m 755 %{buildroot}%{_javadir}
-%{__install} -m 644 dist/%{name}.jar \
-%{buildroot}%{_javadir}/%{name}-%{version}.jar
+%{__install} -m 644 dist/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
+%{__ln_s} %{buildroot}%{_javadir}/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 # javadoc
 %{__install} -d -m 755 %{buildroot}%{_javadocdir}/%{name}-%{version}
 %{__cp} -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
