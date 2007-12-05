@@ -92,7 +92,7 @@ ant javadoc
 # jar
 %{__install} -d -m 755 %{buildroot}%{_javadir}
 %{__install} -m 644 dist/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-%{__ln_s} %{buildroot}%{_javadir}/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+%{__ln_s} %{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 # javadoc
 %{__install} -d -m 755 %{buildroot}%{_javadocdir}/%{name}-%{version}
 %{__cp} -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
