@@ -34,7 +34,7 @@
 
 Name:		ini4j
 Version:	0.2.6
-Release:	%mkrel 3
+Release:	%mkrel 4
 Epoch:		0
 Summary:        Java API for handling Windows ini file format
 License:        Apache License
@@ -43,7 +43,7 @@ Group:		Development/Java
 #
 Source0:        http://switch.dl.sourceforge.net/sourceforge/ini4j/%{name}-src-%{version}.zip
 Patch0:		ini4j-build.patch
-BuildRequires:	jpackage-utils >= 1.6
+BuildRequires:	java-rpmbuild >= 1.6
 BuildRequires:  ant
 BuildRequires:  ant-nodeps
 BuildRequires:  ant-junit
