@@ -27,14 +27,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
+%define _with_gcj_support 1
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		free
 
 Name:		ini4j
 Version:	0.2.6
-Release:	%mkrel 4
+Release:	%mkrel 4.0.1
 Epoch:		0
 Summary:        Java API for handling Windows ini file format
 License:        Apache License
@@ -54,8 +54,6 @@ BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %if %{gcj_support}
 BuildRequires:		java-gcj-compat-devel
-Requires(post):		java-gcj-compat
-Requires(postun):	java-gcj-compat
 %endif
 
 %description
@@ -68,8 +66,6 @@ implementation based on the .ini file.
 %package javadoc
 Summary:	Javadoc for %{name}
 Group:		Development/Java
-Requires(post):   /bin/rm,/bin/ln
-Requires(postun): /bin/rm
 
 %description javadoc
 Javadoc for %{name}.
@@ -77,16 +73,14 @@ Javadoc for %{name}.
 %prep
 %{__rm} -fr %{buildroot}
 %setup -q -c -n %{name}-%{version}
-# remove all binary libs
-find . -name "*.jar" -exec %{__rm} -f {} \;
+%remove_java_binaries
 rm src/classes/org/ini4j/IniPreferencesFactoryListener.java
 rm src/test/org/ini4j/IniPreferencesFactoryListenerTest.java
 %patch0
 
 %build
-[ -z "$JAVA_HOME" ] && export JAVA_HOME=%{_jvmdir}/java 
-ant build
-ant javadoc
+export CLASSPATH=$(build-classpath ant-launcher)
+%ant build javadoc
 
 %install
 # jar
@@ -105,29 +99,14 @@ ant javadoc
 %clean
 %{__rm} -rf %{buildroot}
 
-%post javadoc
-%{__rm} -f %{_javadocdir}/%{name}
-ln -s %{name}-%{version} %{_javadocdir}/%{name}
-
-%postun javadoc
-if [ $1 -eq 0 ]; then
-  %{__rm} -f %{_javadocdir}/%{name}
-fi
-
 %post
 %if %{gcj_support}
-if [ -x %{_bindir}/rebuild-gcj-db ]
-then
-  %{_bindir}/rebuild-gcj-db
-fi
+%update_gcjdb
 %endif
 
 %postun
 %if %{gcj_support}
-if [ -x %{_bindir}/rebuild-gcj-db ]
-then
-  %{_bindir}/rebuild-gcj-db
-fi
+%clean_gcjdb
 %endif
 
 %files
@@ -143,4 +122,4 @@ fi
 %defattr(-,root,root)
 %dir %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}-%{version}/*
-%ghost %{_javadocdir}/%{name}
+%{_javadocdir}/%{name}
