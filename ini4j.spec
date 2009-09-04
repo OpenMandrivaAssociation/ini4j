@@ -34,7 +34,7 @@
 
 Name:		ini4j
 Version:	0.2.6
-Release:	%mkrel 4.0.1
+Release:	%mkrel 4.0.2
 Epoch:		0
 Summary:        Java API for handling Windows ini file format
 License:        Apache License
