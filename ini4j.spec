@@ -6,7 +6,7 @@
 
 Name:           ini4j
 Version:        0.4.1
-Release:        %mkrel 1
+Release:        %mkrel 2
 Summary:        Java API for handling files in Windows .ini format
 
 Group:          Development/Java
@@ -38,7 +38,7 @@ implementation based on the .ini file.
 
 %package javadoc
 Summary:        Javadocs for %{name}
-Group:          Documentation
+Group:          Development/Java
 Requires:       %{name} = %{version}-%{release}
 Requires:       jpackage-utils
 
