@@ -1,125 +1,87 @@
-# Copyright (c) 2000-2005, JPackage Project
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the
-#    distribution.
-# 3. Neither the name of the JPackage Project nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-%define _with_gcj_support 1
-%define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
+# Prevent brp-java-repack-jars from being run.
+%global __jar_repack %{nil}
 
-%define section		free
+%global servlet_jar %{_javadir}/servlet.jar
+%global jetty_jar %{_javadir}/jetty/jetty.jar
 
-Name:		ini4j
-Version:	0.2.6
-Release:	%mkrel 4.0.2
-Epoch:		0
-Summary:        Java API for handling Windows ini file format
-License:        Apache License
-Url:            http://www.ini4j.org/
-Group:		Development/Java
-#
-Source0:        http://switch.dl.sourceforge.net/sourceforge/ini4j/%{name}-src-%{version}.zip
-Patch0:		ini4j-build.patch
-BuildRequires:	java-rpmbuild >= 1.6
-BuildRequires:  ant
-BuildRequires:  ant-nodeps
-BuildRequires:  ant-junit
-%if ! %{gcj_support}
+Name:           ini4j
+Version:        0.4.1
+Release:        %mkrel 1
+Summary:        Java API for handling files in Windows .ini format
+
+Group:          Development/Libraries
+License:        ASL 2.0
+URL:            http://www.ini4j.org/
+Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}-src.zip
+Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
+Source2:        %{name}-%{version}-build.xml
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
-%endif
-BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root
 
-%if %{gcj_support}
-BuildRequires:		java-gcj-compat-devel
-%endif
+# See http://ini4j.sourceforge.net/dependencies.html
+BuildRequires:  jpackage-utils
+BuildRequires:  ant
+BuildRequires:  java-devel >= 1.6.0
+BuildRequires:  tomcat5-servlet-2.4-api >= 5.5
+BuildRequires:  jetty5 >= 4.2.2
+
+Requires:       jpackage-utils
+Requires:       java >= 1.6.0
+Requires:       tomcat5-servlet-2.4-api >= 5.5
 
 %description
-The [ini4j] is a simple Java API for handling 
-configuration files in Windows .ini format. 
-Additionally, the library includes Java Preferences API 
-implementation based on the .ini file. 
-
+The [ini4j] is a simple Java API for handling configuration files in Windows 
+.ini format. Additionally, the library includes Java Preferences API 
+implementation based on the .ini file.
 
 %package javadoc
-Summary:	Javadoc for %{name}
-Group:		Development/Java
+Summary:        Javadocs for %{name}
+Group:          Documentation
+Requires:       %{name} = %{version}-%{release}
+Requires:       jpackage-utils
 
 %description javadoc
-Javadoc for %{name}.
+This package contains the API documentation for %{name}.
 
 %prep
-%{__rm} -fr %{buildroot}
-%setup -q -c -n %{name}-%{version}
-%remove_java_binaries
-rm src/classes/org/ini4j/IniPreferencesFactoryListener.java
-rm src/test/org/ini4j/IniPreferencesFactoryListenerTest.java
-%patch0
+
+%setup -q
+
+cp -a %{SOURCE1} ./LICENSE-2.0.txt
+cp -a %{SOURCE2} ./build.xml
+
+find . -type f \( -iname "*.jar" -o -iname "*.class" \) | xargs -t %{__rm} -f
+
+# remove test sources
+%{__rm} -rf src/test
+# remove site sources
+%{__rm} -rf src/site
 
 %build
-export CLASSPATH=$(build-classpath ant-launcher)
-%ant build javadoc
+
+%ant -Dbuild.servlet.jar=%{servlet_jar} -Dbuild.jetty.jar=%{jetty_jar} build javadoc
 
 %install
-# jar
-%{__install} -d -m 755 %{buildroot}%{_javadir}
-%{__install} -m 644 dist/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-%{__ln_s} %{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
-# javadoc
-%{__install} -d -m 755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__cp} -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
-(cd %{buildroot}%{_javadocdir} && ln -sf %{name}-%{version} %{name})
+%{__rm} -rf %{buildroot}
 
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
+# JAR
+%{__mkdir_p} %{buildroot}%{_javadir}
+%{__cp} -p dist/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
+(cd %{buildroot}%{_javadir} && %{__ln_s} %{name}-%{version}.jar %{name}.jar)
+
+# Javadoc
+%{__mkdir_p} %{buildroot}%{_javadocdir}/%{name}
+%{__cp} -rp build/doc/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %clean
 %{__rm} -rf %{buildroot}
 
-%post
-%if %{gcj_support}
-%update_gcjdb
-%endif
-
-%postun
-%if %{gcj_support}
-%clean_gcjdb
-%endif
-
 %files
-%defattr(-,root,root)
-%doc License.txt ReleaseNotes.txt ChangeLog.txt
+%defattr(-,root,root,-)
 %{_javadir}/*
-
-%if %{gcj_support}
-%attr(-,root,root) %{_libdir}/gcj/%{name}
-%endif
+%doc LICENSE-2.0.txt src/main/java/org/ini4j/package.html
 
 %files javadoc
-%defattr(-,root,root)
-%dir %{_javadocdir}/%{name}-%{version}
-%{_javadocdir}/%{name}-%{version}/*
+%defattr(-,root,root,-)
 %{_javadocdir}/%{name}
