@@ -25,6 +25,7 @@ BuildRequires:  ant
 BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  tomcat5-servlet-2.4-api >= 5.5
 BuildRequires:  jetty5 >= 4.2.2
+BuildRequires:  java-rpmbuild >= 0:1.5.32
 
 Requires:       jpackage-utils
 Requires:       java >= 1.6.0
