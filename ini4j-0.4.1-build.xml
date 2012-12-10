@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="ini4j">
+  <description>
+    Build script for [ini4j] library.
+  </description>
+
+<!-- config ============================================================== -->
+  <!-- general project attributes -->
+  <property name="artifactVersion" value="0.4.1"/>
+  <property name="build.app.name" value="ini4j-${artifactVersion}"/>
+  <!-- directory locations -->
+  <property name="build.dst" value="${basedir}/build"/>
+  <property name="build.src" value="${basedir}/src/"/>
+  <property name="build.dist" value="${basedir}/dist"/>
+
+  <property name="build.dst.classes" value="${build.dst}/classes"/>
+  <property name="build.dst.doc"     value="${build.dst}/doc"/>
+
+  <!-- development tools -->
+  <property name="build.servlet.jar" value="/path/to/servlet.jar"/>
+  <property name="build.jetty.jar" value="/path/to/jetty.jar"/>
+  <!-- compiler options -->
+  <property name="build.compile.debug" value="true"/>
+  <property name="build.compile.deprecation" value="false"/>
+  <property name="build.compile.optimize" value="true"/>
+  <property name="build.compile.version" value="1.5"/>
+  <property name="build.compile.lint" value="-Xlint:unchecked"/>
+
+<!-- clean =============================================================== -->
+<target name="clean" description="Delete old build directory">
+    <delete dir="${build.dst}"/>
+    <delete dir="${build.dist}"/>
+</target>
+
+<!-- prepare ============================================================= -->
+<target name="prepare" description="Prepare build">
+    <path id="build.classpath">
+        <pathelement location="${build.dst.classes}"/>
+        <pathelement path="${java.class.path}"/>                
+        <pathelement location="${build.servlet.jar}"/>
+        <pathelement location="${build.jetty.jar}"/>
+    </path>
+
+    <mkdir dir="${build.dst}"/>
+    <mkdir dir="${build.dist}"/>
+    <mkdir dir="${build.dst.doc}"/>
+</target>
+
+<!-- compile ============================================================= -->
+<target name="compile" depends="prepare" description="Compile Java sources">
+    <mkdir dir="${build.dst.classes}"/>
+
+    <javac
+        classpathref="build.classpath"
+        debug="${build.compile.debug}"
+        deprecation="${build.compile.deprecation}"
+        optimize="${build.compile.optimize}"
+        source="${build.compile.version}"
+        destdir="${build.dst.classes}">        
+        <src path="${build.src}"/>               
+        <compilerarg value="${build.compile.lint}"/>
+    </javac>
+
+    <!-- copy resources -->
+    <copy todir="${build.dst.classes}">
+      <fileset dir="${build.src}" excludes="**/*.java **/*.html **/*.xml **/*.ini"/>
+    </copy>  
+</target>
+
+<!-- javadoc ============================================================= -->
+<target name="javadoc" depends="compile" description="Create Javadoc">
+     <javadoc
+        source="${build.compile.version}"
+        linksource="yes"
+        access="protected"
+        locale="en_US"
+        encoding="ISO-8859-1"
+        docencoding="ISO-8859-1"
+        noqualifier="java.*:javax.*:org.ini4j.*"
+        destdir="${build.dst.doc}/api"
+        windowtitle="[ini4j] API documentation">
+
+        <fileset dir="${build.src}">
+          <include name="**/*.java"/>
+        </fileset>
+        <doctitle>[ini4j] API documentation</doctitle>
+        <header>&lt;b&gt;[ini4j]&lt;/b&gt;</header>
+        <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+        <classpath refid="build.classpath"/>
+    </javadoc>
+</target>
+
+<!-- build =============================================================== -->
+<target name="build" depends="compile" description="Build jar distribution files">
+  <jar destfile="${build.dist}/${build.app.name}.jar">
+    <fileset dir="${build.dst.classes}" excludes="**/*Test* **/*Sample* **/*Run* **/META-INF/**" />
+  </jar>
+</target>
+</project>

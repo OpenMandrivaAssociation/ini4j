@@ -6,7 +6,7 @@
 
 Name:           ini4j
 Version:        0.4.1
-Release:        %mkrel 3
+Release:        3
 Summary:        Java API for handling files in Windows .ini format
 
 Group:          Development/Java
@@ -16,7 +16,6 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}-src.
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Source2:        %{name}-%{version}-build.xml
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
 # See http://ini4j.sourceforge.net/dependencies.html
@@ -64,19 +63,15 @@ find . -type f \( -iname "*.jar" -o -iname "*.class" \) | xargs -t %{__rm} -f
 %ant -Dbuild.servlet.jar=%{servlet_jar} -Dbuild.jetty.jar=%{jetty_jar} build javadoc
 
 %install
-%{__rm} -rf %{buildroot}
 
 # JAR
 %{__mkdir_p} %{buildroot}%{_javadir}
-%{__cp} -p dist/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
+cp -p dist/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
 (cd %{buildroot}%{_javadir} && %{__ln_s} %{name}-%{version}.jar %{name}.jar)
 
 # Javadoc
 %{__mkdir_p} %{buildroot}%{_javadocdir}/%{name}
-%{__cp} -rp build/doc/api/* %{buildroot}%{_javadocdir}/%{name}
-
-%clean
-%{__rm} -rf %{buildroot}
+cp -rp build/doc/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %defattr(-,root,root,-)
@@ -86,3 +81,52 @@ find . -type f \( -iname "*.jar" -o -iname "*.class" \) | xargs -t %{__rm} -f
 %files javadoc
 %defattr(-,root,root,-)
 %{_javadocdir}/%{name}
+
+
+%changelog
+* Fri Dec 10 2010 Oden Eriksson <oeriksson@mandriva.com> 0.4.1-3mdv2011.0
++ Revision: 619629
+- the mass rebuild of 2010.0 packages
+
+* Fri Sep 25 2009 Jaroslav Tulach <jtulach@mandriva.org> 0.4.1-2mdv2010.0
++ Revision: 448936
+- Upgrading to 0.4.1 version
+
+* Fri Sep 04 2009 Thierry Vignaud <tv@mandriva.org> 0:0.2.6-4.0.2mdv2010.0
++ Revision: 429511
+- rebuild
+
+* Mon Feb 18 2008 Alexander Kurtakov <akurtakov@mandriva.org> 0:0.2.6-4.0.1mdv2008.1
++ Revision: 171024
+- spec cleanup
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Sun Dec 16 2007 Anssi Hannula <anssi@mandriva.org> 0:0.2.6-4mdv2008.1
++ Revision: 120893
+- buildrequire java-rpmbuild, i.e. build with icedtea on x86(_64)
+
+* Mon Dec 10 2007 Jaroslav Tulach <jtulach@mandriva.org> 0:0.2.6-3mdv2008.1
++ Revision: 116877
+- Fixing broken link from ini4j.jar
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - better summary
+
+* Wed Dec 05 2007 Jaroslav Tulach <jtulach@mandriva.org> 0:0.2.6-2mdv2008.1
++ Revision: 115624
+- Creating generic ini4j.jar link to actual version of the JAR file
+
+* Fri Nov 30 2007 Jaroslav Tulach <jtulach@mandriva.org> 0:0.2.6-1mdv2008.1
++ Revision: 114099
+- According to template standard file, javadoc belongs to Dev/Java group
+- Build also contains junit tests and thus needs a dependency on ant-junit
+- Inproper specification of build root
+- The build needs proper dependency on ant-nodeps
+- import ini4j
+
+
