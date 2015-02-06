@@ -6,7 +6,7 @@
 
 Name:           ini4j
 Version:        0.4.1
-Release:        3
+Release:        4
 Summary:        Java API for handling files in Windows .ini format
 
 Group:          Development/Java
