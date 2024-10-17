@@ -11,7 +11,7 @@ Summary:        Java API for handling files in Windows .ini format
 
 Group:          Development/Java
 License:        ASL 2.0
-URL:            http://www.ini4j.org/
+URL:            https://www.ini4j.org/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}-src.zip
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Source2:        %{name}-%{version}-build.xml
